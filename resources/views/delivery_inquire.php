@@ -3,7 +3,11 @@
 		<title>delivery_inquire</title>
 	</head>
 	<body>
-		<?php if ($result['company'] == 'postoffice') :?>
+		<?php if ($result['company'] == 'cj') :?>
+			<?=$result['company']?><br>
+			<?=$result['num']?><br>
+			<?=$result['test']?><br>
+		<?php elseif ($result['company'] == 'postoffice') :?>
 			<?=$result['company']?><br>
 			<?=$result['num']?><br>
 			<?=$result['sender']?><br>

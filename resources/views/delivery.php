@@ -16,6 +16,7 @@
 					<td>
 						<select id="company">
 							<option value="base">택배사를 선택하세요</option>
+							<option value="cj">CJ대한통운</option>
 							<option value="postoffice">우체국택배</option>
 							<option value="logen">로젠택배</option>
 							<option value="direct">직접입력</option>
