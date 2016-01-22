@@ -18,6 +18,7 @@ function dvInquire(){
 	
 	//var company = ($("#company").val() == 'direct')? $("#company_direct").val(): $("#company").val();
 	
+	
 	if (company == 'base'){
 		alert("택배사를 선택해주세요.");
 		return;
@@ -75,3 +76,9 @@ function dvInquire(){
 }
 
 // check regular expression?
+
+function attackGoogle(){
+	var adr_ctr = $("#adr_ctr").val();
+	
+	location.href = adr_ctr + "Google/test";
+}

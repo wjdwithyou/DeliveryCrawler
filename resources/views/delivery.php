@@ -54,6 +54,7 @@
 					<td colspan="2"><button type="button" onclick="dvInquire();">조회하기</button></td>
 				</tr>
 			</table>
+			<button type="button" onclick="attackGoogle();">구글을 침략한다</button>
 		</form>
 	</body>
 </html>
