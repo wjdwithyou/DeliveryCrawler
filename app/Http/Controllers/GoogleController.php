@@ -8,7 +8,7 @@ class GoogleController extends Controller{
 	public function crawlTest(){
 		$ch = curl_init();
 		
-		curl_setopt($ch, CURLOPT_URL, "https://www.google.com/search?q=Jack+Spade+Men^s+Bromley+Crew-Neck+Sweater&tbm=shop&cad=h");
+		curl_setopt($ch, CURLOPT_URL, "https://www.google.com/search?q=iphone+6s&tbm=shop&cad=h");
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -111,61 +111,58 @@ class GoogleController extends Controller{
 			if ($num == '')		// if product number doesn't exist, process next product.
 				continue;
 			
-			
-			$review = file_get_contents('http://www.google.com/shopping/product/5822634609657924093');
-			//$review = file_get_contents('http://www.google.com/shopping/product/'.$num.'/reviews');
-			
-			if (strpos($review, "The product could not be found")){
-				fclose($fp);
-				return '잘못된 상품번호('.$num.')입니다.';
-			}
-			
-			if (!strpos($review, "\"review-section-results\"")){
-				fclose($fp);
-				return '리뷰가 없습니다.';
-			}
-			
-			$review = substr($review, strpos($review, "\"review-section-results\""));
-			
-			$reviews = array();
-			
-			while (strpos($review, "_G")){
-				$temp = array();
-				
-				$review = substr($review, strpos($review, "review-title") + 14);
-				$temp['title'] = substr($review, 0, strpos($review, "<"));
-				
-				$review = substr($review, strpos($review, "aria-label") + 12);
-				$temp['star'] = substr($review, 0, strpos($review, "\""));
-				
-				$review = substr($review, strpos($review, "</span>"));
-				
-				$review = substr($review, strpos($review, "By ") + 3);
-				$temp['writer'] = substr($review, 0, strpos($review, "  "));
-				
-				$review = substr($review, strpos($review, "- ") + 2);
-				$temp['date'] = substr($review, 0, strpos($review, "   "));
-				
-				$review = substr($review, strpos($review, "review-content"));
-				
-				$review = substr($review, strpos($review, "<span>") + 6);
-				$temp['alt'] = substr($review, 0, strpos($review, "</span>"));
-				
-				array_push($reviews, $temp);
-			}
-			
-			// idx (=$i+1) | product_num
-				// review 1
-				// star | title | writer | date
-				// alt
-				// review 2
-				// ...
-			//	idx	(next)
-			
 			$txt = "idx ".($i + 1)." | ".$num."\r\n";
 			
-			for ($j = 0; $j < count($reviews); ++$j)
-				$txt .= "review ".($j + 1)."\r\n".$reviews[$j]['star']."\r\n".$reviews[$j]['alt']."\r\n";
+			$review = file_get_contents('http://www.google.com/shopping/product/'.$num);
+			
+			if (strpos($review, "The product could not be found"))
+				$txt .= "잘못된 상품번호('.$num.')입니다.\r\n";
+			else if (!strpos($review, "\"review-section-results\""))
+				$txt .= "리뷰가 없습니다.\r\n";
+			else{
+				$review = substr($review, strpos($review, "\"review-section-results\""));
+				
+				$reviews = array();
+				
+				while (strpos($review, "_G")){
+					$temp = array();
+					
+					$review = substr($review, strpos($review, "review-title") + 14);
+					$temp['title'] = substr($review, 0, strpos($review, "<"));
+					
+					$review = substr($review, strpos($review, "aria-label") + 12);
+					$temp['star'] = substr($review, 0, strpos($review, "\""));
+					
+					$review = substr($review, strpos($review, "</span>"));
+					
+					$review = substr($review, strpos($review, "By ") + 3);
+					$temp['writer'] = substr($review, 0, strpos($review, "  "));
+					
+					$review = substr($review, strpos($review, "- ") + 2);
+					$temp['date'] = substr($review, 0, strpos($review, "   "));
+					
+					$review = substr($review, strpos($review, "review-content"));
+					
+					$review = substr($review, strpos($review, "<span>") + 6);
+					$temp['alt'] = substr($review, 0, strpos($review, "</span>"));
+					
+					array_push($reviews, $temp);
+				}
+				
+				// idx (=$i+1) | product_num
+					// review 1
+					// star | title | writer | date
+					// alt
+					// review 2
+					// ...
+				//	idx	(next)
+				
+				for ($j = 0; $j < count($reviews); ++$j){
+					$txt .= "review ".($j + 1)."\r\n";
+					$txt .= $reviews[$j]['star']." | ".$reviews[$j]['title']." | ".$reviews[$j]['writer']." | ".$reviews[$j]['date']."\r\n";
+					$txt .= $reviews[$j]['alt']."\r\n";
+				}
+			}
 			
 			$txt .= "\r\n";
 			
