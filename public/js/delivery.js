@@ -80,5 +80,11 @@ function dvInquire(){
 function attackGoogle(){
 	var adr_ctr = $("#adr_ctr").val();
 	
-	location.href = adr_ctr + "Google/test";
+	location.href = adr_ctr + "Google/crawlTest";
+}
+
+function collectReview(){
+	var adr_ctr = $("#adr_ctr").val();
+	
+	location.href = adr_ctr + "Google/crawlReview"
 }
