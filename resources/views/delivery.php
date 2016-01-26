@@ -55,7 +55,8 @@
 				</tr>
 			</table>
 			<button type="button" onclick="attackGoogle();">구글을 침략한다</button>
-			<button type="button" onclick="collectReview();">리뷰 모으기</button>
+			<button type="button" onclick="collectReview('hotdeal');">Hotdeal Review</button>
+			<button type="button" onclick="collectReview('product');">Product Review</button>
 		</form>
 	</body>
 </html>

@@ -11,9 +11,9 @@ class ProductModel{
 		return array('code' => 1, 'msg' => 'success', 'data' => $product);
 	}
 	
-	function getHotdealProductAll(){
-		$hotdeal_product = DB::select('select idx, name from hotdeal_product');
+	function getHotdealAll(){
+		$hotdeal = DB::select('select idx, name from hotdeal_product');
 		
-		return array('code' => 1, 'msg' => 'success', 'data' => $hotdeal_product);
+		return array('code' => 1, 'msg' => 'success', 'data' => $hotdeal);
 	}
 }

@@ -2,13 +2,48 @@
 namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\models\ProductModel;
-//use Request;
+use App\Http\models\ReviewModel;
+use Request;
 
 class GoogleController extends Controller{
-	public function crawlTest(){
+	
+	/*
+	// 160126 J.Style
+	// Between $tStart and $tFinish, insert your code what you want to check execution time.
+	public function timeTest(){
+		$temp = 0;
+		
+		for ($i = 1; $i <= 100; ++$i){
+			$tStart = explode(" ", microtime());	// start
+				
+			$ch = curl_init();
+				
+			curl_setopt($ch, CURLOPT_URL, "https://www.google.com/search?q=iphone+6s&tbm=shop&cad=h");
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+			curl_setopt($ch, CURLOPT_SSLVERSION, 3);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_REFERER, 'https://www.google.com/shopping');
+				
+			$html = curl_exec($ch);
+				
+			curl_close($ch);
+				
+			$tFinish = explode(" ", microtime());	// end
+			$tElapsedMicroSec = ($tFinish[1] - $tStart[1]) + ($tFinish[0] - $tStart[0]);
+			
+			$temp += $tElapsedMicroSec;
+			
+			print ($i." :: ".$tElapsedMicroSec. " // ".$temp."<br/>");
+		}
+	}
+	*/
+	
+	public function crawlTest(){	// just test function.
 		$ch = curl_init();
 		
-		curl_setopt($ch, CURLOPT_URL, "https://www.google.com/search?q=iphone+6s&tbm=shop&cad=h");
+		curl_setopt($ch, CURLOPT_URL, "https://www.google.com/search?q=Cycle+ring&tbm=shop&cad=h");
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSLVERSION, 3);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -31,7 +66,6 @@ class GoogleController extends Controller{
 		
 		return $num;
 		
-		
 		return file_get_contents('http://www.google.com/shopping/product/'.$num.'/reviews');
 		
 		//$page = 'google';
@@ -39,17 +73,21 @@ class GoogleController extends Controller{
 	}
 	
 	public function crawlReview(){
+		ini_set('max_execution_time', -1);
+		
+		$param = Request::input('param');	// hotdeal, product
+		
 		$pdModel = new ProductModel();
+		$rvModel = new ReviewModel();
 		
-		//$productList = $pdModel->getProductAll();
-		$hotdealList = $pdModel->getHotdealProductAll();	// idx begins 1
+		$List = ($param == 'hotdeal')? $pdModel->getHotdealAll(): $pdModel->getProductAll();	// idx begins 1
 		
-		$fp = fopen("testlog.txt", "a");
+		$fp = fopen($param."_log.txt", "a");
 		
-		
-		for ($i = 0; $i < count($hotdealList['data']); ++$i){
-			$remain = $hotdealList['data'][$i]->name;
+		for ($i = 0; $i < count($List['data']); ++$i){
+			$remain = $List['data'][$i]->name;
 			$rename = '';
+			$txt = '';
 			
 			while (true){
 				if (!strpos($remain, " ")){
@@ -61,8 +99,6 @@ class GoogleController extends Controller{
 				$rename .= "+";
 				$remain = substr($remain, strpos($remain, " ") + 1);
 			}
-			
-			
 			
 			$ch = curl_init();
 			
@@ -111,7 +147,7 @@ class GoogleController extends Controller{
 			if ($num == '')		// if product number doesn't exist, process next product.
 				continue;
 			
-			$txt = "idx ".($i + 1)." | ".$num."\r\n";
+			$txt .= "idx ".($i + 1)." | ".$num."\r\n";
 			
 			$review = file_get_contents('http://www.google.com/shopping/product/'.$num);
 			
@@ -147,6 +183,12 @@ class GoogleController extends Controller{
 					$temp['alt'] = substr($review, 0, strpos($review, "</span>"));
 					
 					array_push($reviews, $temp);
+					
+					// for DB
+					if ($param == 'hotdeal')
+						$rvModel->createHotdeal($i+1, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
+					else
+						$rvModel->createProduct($i+1, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
 				}
 				
 				// idx (=$i+1) | product_num
