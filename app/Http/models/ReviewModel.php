@@ -36,7 +36,7 @@ class ReviewModel{
 		$test = DB::select('select * from product_review where product_idx=?', array($product_idx));
 		
 		for ($i = 0; $i < count($test); ++$i){
-			if ($test[$i]['rating'] == $rating && $test[$i]['writer_name'] == $writer_name)
+			if ($test[$i]->rating == $rating && $test[$i]->writer_name == $writer_name)
 				return array('code' => 0, 'msg' => 'duplicate');
 		}
 		

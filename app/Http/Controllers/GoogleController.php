@@ -147,7 +147,8 @@ class GoogleController extends Controller{
 			if ($num == '')		// if product number doesn't exist, process next product.
 				continue;
 			
-			$txt .= "idx ".($i + 1)." | ".$num."\r\n";
+			//$txt .= "idx ".($i + 1)." | ".$num."\r\n";
+			$txt .= "idx ".$List['data'][$i]->idx." | ".$num."\r\n";
 			
 			$review = file_get_contents('http://www.google.com/shopping/product/'.$num);
 			
@@ -186,9 +187,11 @@ class GoogleController extends Controller{
 					
 					// for DB
 					if ($param == 'hotdeal')
-						$rvModel->createHotdeal($i+1, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
+						//$rvModel->createHotdeal($i+1, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
+						$rvModel->createHotdeal($List['data'][$i]->idx, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
 					else
-						$rvModel->createProduct($i+1, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
+						//$rvModel->createProduct($i+1, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
+						$rvModel->createProduct($List['data'][$i]->idx, $temp['star'], $temp['writer'], $temp['title'], $temp['date'], $temp['alt']);
 				}
 				
 				// idx (=$i+1) | product_num
@@ -212,6 +215,9 @@ class GoogleController extends Controller{
 		}
 		
 		fclose($fp);
+		
+		$page = 'google_result';
+		return view($page, array('page' => $page, 'param' => $param, 'cnt' => count($List['data'])));
 	}
 }
 
